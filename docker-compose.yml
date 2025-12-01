@@ -1,0 +1,30 @@
+docker-compose.ymlversion: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=app.py
+    volumes:
+      - ./backend:/app
+    command: gunicorn --bind 0.0.0.0:5000 app:app
+    networks:
+      - spam-detector-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://backend:5000
+    depends_on:
+      - backend
+    networks:
+      - spam-detector-network
+
+networks:
+  spam-detector-network:
+    driver: bridge
